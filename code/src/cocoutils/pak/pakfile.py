@@ -4,7 +4,7 @@ The PAK's header
 @author: Robson
 '''
 
-from struct import *; 
+from struct import *
 
 
 class PAKHeader:
