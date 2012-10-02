@@ -4,10 +4,10 @@ The PAK's header
 @author: Robson
 '''
 
-from struct import *
+from struct import unpack, calcsize, pack
 
 
-class PAKHeader:
+class PAKHeader(object):
     
     __hdr="<HH"
     
@@ -29,8 +29,8 @@ class PAKHeader:
         self.data = data[tam:tam+self.length]
         self.extra = data[tam+self.length:]
 
-    def loadfile(self, file):
-        arq=open(file,"rb")
+    def loadfile(self, filen):
+        arq=open(filen,"rb")
         dt=arq.read()
         self.load(dt)
         arq.close()

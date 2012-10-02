@@ -1,8 +1,7 @@
 import sys,math
 from itertools import izip_longest, chain
 from struct import pack
-
-# 40 and 20 were chosen 
+  
 onda = [int(32000.0 * math.sin(float(k) / 20.0 * math.pi)) for k in range(40)]
 onda_2 = [int(32000.0 * math.sin(float(k) / 11.0 * math.pi)) for k in range(22)]
 onda_bytes = (bytearray(chain.from_iterable([pack("h",n) * 2 for n in onda])),
@@ -33,7 +32,7 @@ class Cas2Wav(object):
                 self.__file.write(bloco)
                 baite >>= 1
     
-    def __exit__(self,type,val,tb):
+    def __exit__(self,typ,val,tb):
         try:
             self.__file.seek(4)
             self.__file.write(bytearray(pack("I",self.__sc2s + 36)))
@@ -73,24 +72,22 @@ def grouper(n, iterable, fillvalue=None):
     return izip_longest(fillvalue=fillvalue, *args)        
 
 
-if __name__ == "__main__":
-    if sys.argv[1] == "-w":
-        nome = sys.argv[2]
+def rom_to_cas_wav(infile, frm='cas'):
+    if frm.lower() == 'wav':
         fn = cas_to_wav
-        saida = nome.replace(".rom",".wav")
+        repl = "wav"
+    elif frm.lower() == 'cas':
+        fn = cas_to_wav
+        repl = "cas"
     else:
-        nome = sys.argv[1]
-        fn = open
-        saida = nome.replace(".rom",".cas")      
-        
-    nf = nome.replace(".rom","")
-    with open(nome,"r") as arq:
-        dados = bytearray(arq.read())
-    print len(dados)    
+        raise Exception("Invalid format")
+    saida = infile.lower().replace(".rom",repl)
+    nf = infile.upper().replace(".rom","")
+    with open(infile,"r") as arq:
+        dados = bytearray(arq.read())   
     leader = bytearray("U" * 128)
     q = len(dados) // 255
     u  = len(dados) % 255
-    print q,u
     with fn(saida,"wb") as s:    
         s.write(leader)
         BlocoArquivo(2,nf).write(s)
@@ -102,5 +99,13 @@ if __name__ == "__main__":
             Bloco(1, b).write(s)
             if a == q: break
         BlocoEOF().write(s)
-
     
+
+if __name__ == "__main__":
+    if sys.argv[1] == "-w":
+        nome = sys.argv[2]
+        frm = "wav"
+    else:
+        nome = sys.argv[1]
+        frm = "cas"
+    rom_to_cas_wav(nome, frm)
